@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>О себе — КиноРейтинг</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+</head>
+<body>
+  <nav><a href="/">Фильмы</a> <a href="/about">О себе</a></nav>
+
+  <h1>О себе</h1>
+
+  <table class="info">
+    <tr><th>ФИО</th><td>Батушкин Даниил Леонидович</td></tr>
+    <tr><th>Группа</th><td>932403</td></tr>
+    <tr><th>Вариант</th><td>15 — «Список фильмов с рейтингом»</td></tr>
+  </table>
+
+  <h2>Описание приложения</h2>
+  <p>
+    "КиноРейтинг" - список фильмов с оценками. Главная страница получает данные
+    с собственного API и позволяет отфильтровать фильмы по минимальному рейтингу.
+    Приложение устанавливается как PWA и работает офлайн: статика и последний
+    полученный список фильмов кешируются service worker.
+  </p>
+
+  <h3>Маршруты</h3>
+  <table class="api">
+    <thead>
+      <tr><th>Метод</th><th>Путь</th><th>Назначение</th><th>Ответ</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/</code></td><td>Главная страница со списком фильмов</td><td>200, HTML</td></tr>
+      <tr><td>GET</td><td><code>/about</code></td><td>Страница об авторе и документация API</td><td>200, HTML</td></tr>
+      <tr><td>GET</td><td><code>/api/movies</code></td><td>Список фильмов в формате JSON</td><td>200 или 400, JSON</td></tr>
+      <tr><td>GET</td><td>любой другой</td><td>Несуществующий ресурс</td><td>404, JSON</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Параметры <code>/api/movies</code></h3>
+  <table class="api">
+    <thead>
+      <tr><th>Параметр</th><th>Где</th><th>Тип</th><th>Допустимые значения</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>minRating</code></td>
+        <td>query-строка</td>
+        <td>число (дробное)</td>
+        <td>от 0 до 10; разделитель — точка или запятая</td>
+      </tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Без параметра возвращается <b>весь список</b> фильмов.</li>
+    <li>С параметром — только фильмы, у которых <code>rating &gt;= minRating</code>.</li>
+    <li>В обоих случаях результат отсортирован по <code>rating</code> <b>по убыванию</b>;
+        при равных оценках — по названию по алфавиту.</li>
+    <li>Имена параметров чувствительны к регистру: <code>minrating</code> не распознаётся
+        и игнорируется (вернётся весь список).</li>
+  </ul>
+
+  <h3>Формат ответа</h3>
+  <p>Массив объектов. Поля одного элемента:</p>
+  <table class="api">
+    <thead><tr><th>Поле</th><th>Тип</th><th>Описание</th></tr></thead>
+    <tbody>
+      <tr><td><code>title</code></td><td>string</td><td>Название фильма</td></tr>
+      <tr><td><code>year</code></td><td>number (целое)</td><td>Год выпуска</td></tr>
+      <tr><td><code>rating</code></td><td>number</td><td>Рейтинг по шкале 0–10</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Пример запроса</h3>
+  <pre>GET /api/movies?minRating=9</pre>
+
+  <h3>Пример ответа (200 OK)</h3>
+<pre>[
+  { "title": "Побег из Шоушенка", "year": 1994, "rating": 9.3 },
+  { "title": "Крёстный отец",     "year": 1972, "rating": 9.2 },
+  { "title": "Тёмный рыцарь",     "year": 2008, "rating": 9.0 }
+]</pre>
+
+  <h3>Ошибки</h3>
+  <table class="api">
+    <thead><tr><th>Код</th><th>Когда возникает</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td>400</td><td>Значение не является числом</td><td><code>?minRating=abc</code></td></tr>
+      <tr><td>400</td><td>Пустое значение</td><td><code>?minRating=</code></td></tr>
+      <tr><td>400</td><td>Вне диапазона 0–10</td><td><code>?minRating=11</code>, <code>?minRating=-1</code></td></tr>
+      <tr><td>400</td><td>Параметр передан несколько раз</td><td><code>?minRating=7&amp;minRating=8</code></td></tr>
+      <tr><td>404</td><td>Неизвестный маршрут</td><td><code>/api/films</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Пример ответа с ошибкой (400 Bad Request)</h3>
+<pre>{
+  "error": "minRating должен быть числом",
+  "received": "abc"
+}</pre>
+
+  <p>
+    Если под фильтр не подошёл ни один фильм, возвращается код 200 и пустой массив.
+  </p>
+
+  <script src="/js/register-sw.js"></script>
+</body>
+</html>

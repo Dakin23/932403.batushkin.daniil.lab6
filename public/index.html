@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>КиноРейтинг</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+</head>
+<body>
+  <nav><a href="/">Фильмы</a> <a href="/about">О себе</a></nav>
+
+  <h1>Список фильмов с рейтингом</h1>
+
+  <p class="net">
+    Сеть: <b id="net">online</b>
+    <span id="offlineTag" hidden>· данные из кеша</span>
+  </p>
+
+  <form id="filter">
+    <label>Минимальный рейтинг:
+      <input id="minRating" type="text" inputmode="decimal" placeholder="например 8.5">
+    </label>
+    <button type="submit">Применить</button>
+    <button type="button" id="reset">Все фильмы</button>
+  </form>
+
+  <p class="hint">Пустое поле — все фильмы.</p>
+
+  <p id="error" class="error" hidden></p>
+  <p id="count"></p>
+  <ol id="list"></ol>
+
+  <script src="/js/register-sw.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
